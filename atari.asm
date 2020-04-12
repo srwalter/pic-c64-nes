@@ -70,7 +70,6 @@ main:
         bcf     STATUS, RP0
 
         bsf     PORTA, PORTA_LATCH
-
         call    delay
         bcf     PORTA, PORTA_LATCH
         call    delay
