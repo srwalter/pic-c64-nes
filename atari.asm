@@ -4,33 +4,33 @@
         __CONFIG _RC_OSC & _WDT_OFF & _CP_OFF & _BOREN_OFF
         radix dec
 
-        CONSTANT IRQ_W=0x7f
-        CONSTANT IRQ_STATUS=0x7e
-        CONSTANT COMMAND=0x7d
-        CONSTANT SRQ_COUNT=0x7c
+        CONSTANT BUTTONS=0x20
 
-        CONSTANT XFER_TMP_BUF=0x30
-        CONSTANT RESP_BUF=0x40
-        CONSTANT RESP_BUF_LEN=0x4F
+        CONSTANT PORTA_CLK=0    ; blue
+        CONSTANT PORTA_DATA=1   ; green
+        CONSTANT PORTA_LATCH=2  ; black
 
-        ; 0x30 - 0x38 send/receive temp space
-        ; 0x40 - 0x4E command response buffer
+        CONSTANT PORTB_UP=7
+        CONSTANT PORTB_DOWN=6
+        CONSTANT PORTB_LEFT=5
+        CONSTANT PORTB_RIGHT=4
+        CONSTANT PORTB_POTY=3
+        CONSTANT PORTB_FIRE=2
+        CONSTANT PORTB_POTX=1
+
+read_and_clock macro
+        rlf     BUTTONS, F
+        btfsc   PORTA, PORTA_DATA
+        bsf     BUTTONS, 0
+
+        bsf     PORTA, PORTA_CLK
+        bcf     PORTA, PORTA_CLK
+        endm
 
 MAIN CODE
 start
 
-        .sim ".frequency=20e6"
-        .sim "module library libgpsim_modules"
-        .sim "module load usart U1"
-
-        .sim "node n0"
-        .sim "node n1"
-
-        .sim "attach n0 portb2 U1.RXPIN"
-        .sim "attach n1 portb1 U1.TXPIN"
-
-        .sim "U1.txbaud = 19200"
-        .sim "U1.rxbaud = 19200"
+        .sim ".frequency=8e6"
 
         org 0
         goto main
@@ -46,14 +46,30 @@ main:
         bsf     STATUS, RP0
         clrf    TRISB
         clrf    TRISA
+        ; DATA is an input
+        bsf     TRISA, PORTA_DATA
         ; set all RA0-3 to digital
         bsf     ADCON1, PCFG0
         bsf     ADCON1, PCFG1
         bsf     ADCON1, PCFG2
         bcf     STATUS, RP0
-        incf    PORTA, F
+
+        bsf     PORTA, PORTA_LATCH
+        bcf     PORTA, PORTA_LATCH
+
+        clrf    BUTTONS
+        read_and_clock
+        read_and_clock
+        read_and_clock
+        read_and_clock
+        read_and_clock
+        read_and_clock
+        read_and_clock
+        read_and_clock
+
+        movfw   BUTTONS
+        movwf   PORTB
 
 loop:
-        incf    PORTB, F
         goto    loop
         end
