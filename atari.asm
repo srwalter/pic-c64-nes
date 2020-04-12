@@ -5,6 +5,7 @@
         radix dec
 
         CONSTANT BUTTONS=0x20
+        CONSTANT TMP=0x21
 
         CONSTANT PORTA_CLK=0    ; blue
         CONSTANT PORTA_DATA=1   ; green
@@ -24,7 +25,9 @@ read_and_clock macro
         bsf     BUTTONS, 0
 
         bsf     PORTA, PORTA_CLK
+        call    delay
         bcf     PORTA, PORTA_CLK
+        call    delay
         endm
 
 MAIN CODE
@@ -38,6 +41,16 @@ start
         nop
         nop
         nop
+
+        ; delay ~50uS
+delay:
+        movlw   50
+        movwf   TMP
+delay_loop:
+        decf    TMP, F
+        btfss   STATUS, Z
+        goto    delay_loop
+        return
 
 main:
         bcf     STATUS, RP0
@@ -55,7 +68,9 @@ main:
         bcf     STATUS, RP0
 
         bsf     PORTA, PORTA_LATCH
+        call    delay
         bcf     PORTA, PORTA_LATCH
+        call    delay
 
         clrf    BUTTONS
         read_and_clock
