@@ -20,8 +20,8 @@
         CONSTANT PORTB_POTX=1
 
 read_and_clock macro bit
-        btfsc   PORTA, PORTA_DATA
-        bsf     BUTTONS, bit
+        btfss   PORTA, PORTA_DATA
+        bcf     BUTTONS, bit
 
         bsf     PORTA, PORTA_CLK
         call    delay
@@ -57,8 +57,8 @@ main:
         clrf    PORTB
         ; POTX drives high, unlike all the other signals
         bsf     PORTB, PORTB_POTX
+
         bsf     STATUS, RP0
-        clrf    TRISB
         clrf    TRISA
 
         ; DATA is an input
@@ -75,7 +75,8 @@ loop:
         bcf     PORTA, PORTA_LATCH
         call    delay
 
-        clrf    BUTTONS
+        movlw   0xff
+        movwf   BUTTONS
         read_and_clock  PORTB_FIRE
         read_and_clock  PORTB_POTX
         read_and_clock  0        ; select
