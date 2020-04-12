@@ -20,8 +20,6 @@
         CONSTANT PORTB_POTX=1
 
 read_and_clock macro bit
-        bcf     STATUS, C
-        rlf     BUTTONS, F
         btfsc   PORTA, PORTA_DATA
         bsf     BUTTONS, bit
 
