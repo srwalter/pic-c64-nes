@@ -52,12 +52,6 @@ delay_loop:
         return
 
 main:
-        bcf     STATUS, RP0
-        clrf    PORTA
-        clrf    PORTB
-        ; POTX drives high, unlike all the other signals
-        bsf     PORTB, PORTB_POTX
-
         bsf     STATUS, RP0
         clrf    TRISA
 
@@ -70,6 +64,9 @@ main:
         bcf     STATUS, RP0
 
 loop:
+        ; POTX drives high, unlike all the other signals
+        movlw   2
+        movwf   PORTB
         bsf     PORTA, PORTA_LATCH
         call    delay
         bcf     PORTA, PORTA_LATCH
