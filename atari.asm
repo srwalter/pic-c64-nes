@@ -20,9 +20,10 @@
         CONSTANT PORTB_POTX=1
 
 read_and_clock macro
-        rlf     BUTTONS, F
+        bcf     STATUS, C
         btfsc   PORTA, PORTA_DATA
-        bsf     BUTTONS, 0
+        bsf     STATUS, C
+        rlf     BUTTONS, F
 
         bsf     PORTA, PORTA_CLK
         call    delay
@@ -59,6 +60,7 @@ main:
         bsf     STATUS, RP0
         clrf    TRISB
         clrf    TRISA
+
         ; DATA is an input
         bsf     TRISA, PORTA_DATA
         ; set all RA0-3 to digital
@@ -68,6 +70,7 @@ main:
         bcf     STATUS, RP0
 
         bsf     PORTA, PORTA_LATCH
+
         call    delay
         bcf     PORTA, PORTA_LATCH
         call    delay
