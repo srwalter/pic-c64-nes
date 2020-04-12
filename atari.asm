@@ -40,11 +40,20 @@ start
         nop
 
 main:
+        bcf     STATUS, RP0
         clrf    PORTA
         clrf    PORTB
+        bsf     STATUS, RP0
         clrf    TRISB
+        clrf    TRISA
+        ; set all RA0-3 to digital
+        bsf     ADCON1, PCFG0
+        bsf     ADCON1, PCFG1
+        bsf     ADCON1, PCFG2
+        bcf     STATUS, RP0
+        incf    PORTA, F
 
 loop:
-        incf    PORTB
+        incf    PORTB, F
         goto    loop
         end
