@@ -19,11 +19,11 @@
         CONSTANT PORTB_FIRE=2
         CONSTANT PORTB_POTX=1
 
-read_and_clock macro
+read_and_clock macro bit
         bcf     STATUS, C
-        btfsc   PORTA, PORTA_DATA
-        bsf     STATUS, C
         rlf     BUTTONS, F
+        btfsc   PORTA, PORTA_DATA
+        bsf     BUTTONS, bit
 
         bsf     PORTA, PORTA_CLK
         call    delay
@@ -57,6 +57,8 @@ main:
         bcf     STATUS, RP0
         clrf    PORTA
         clrf    PORTB
+        ; POTX drives high, unlike all the other signals
+        bsf     PORTB, PORTB_POTX
         bsf     STATUS, RP0
         clrf    TRISB
         clrf    TRISA
@@ -69,24 +71,25 @@ main:
         bsf     ADCON1, PCFG2
         bcf     STATUS, RP0
 
+loop:
         bsf     PORTA, PORTA_LATCH
         call    delay
         bcf     PORTA, PORTA_LATCH
         call    delay
 
         clrf    BUTTONS
-        read_and_clock
-        read_and_clock
-        read_and_clock
-        read_and_clock
-        read_and_clock
-        read_and_clock
-        read_and_clock
-        read_and_clock
+        read_and_clock  PORTB_FIRE
+        read_and_clock  PORTB_POTX
+        read_and_clock  0        ; select
+        read_and_clock  0        ; start
+        read_and_clock  PORTB_UP
+        read_and_clock  PORTB_DOWN
+        read_and_clock  PORTB_LEFT
+        read_and_clock  PORTB_RIGHT
 
         movfw   BUTTONS
-        movwf   PORTB
-
-loop:
+        bsf     STATUS, RP0
+        movwf   TRISB
+        bcf     STATUS, RP0
         goto    loop
         end
